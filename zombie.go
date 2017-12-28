@@ -48,30 +48,33 @@ func ExecCommandPath(path string) (outputs []string, err error) {
 		var aspas string
 		var startString int
 		var endString int
-		for i, item := range comm {
+		for i, l := 0, len(comm); i < l; i++ {
+			item := comm[i]
 			if matched, err := regexp.MatchString("^'", item); err != nil {
 				fmt.Println(err.Error())
+
 			} else if matched && aspas == "" {
 				startString = i
 				aspas = item
 			} else if matched, err := regexp.MatchString("'$", item); err != nil {
 				fmt.Println(err.Error())
+
 			} else if matched {
 				aspas = fmt.Sprintf("%s %s", aspas, item)
 				endString = i
-				break
+				comm = append(comm[:startString], comm[endString:]...)
+				comm[startString] = aspas
+				aspas = ""
+				l = len(comm)
+				//break
 			} else {
 				if aspas != "" {
 					aspas = fmt.Sprintf("%s %s", aspas, item)
 				}
 			}
 		}
-		if aspas != "" {
-			comm = append(comm[:startString], comm[endString:]...)
-			comm[startString] = aspas
-		}
 
-		fmt.Println(comm)
+		fmt.Println(strings.Join(comm, "_"))
 
 		out, err := exec.Command(comm[0], comm[1:]...).CombinedOutput()
 		if err != nil {
