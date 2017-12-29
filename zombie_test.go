@@ -11,6 +11,11 @@ func TestReadArchive(t *testing.T) {
 	if x, _ := readArchive(in); !reflect.DeepEqual(x, out) {
 		t.Errorf("readArchive(%v) = %v, want %v", in, x, out)
 	}
+	// Error case
+	var inErr = "configx"
+	if _, err := readArchive(inErr); err == nil {
+		t.Errorf("readArchive(%v) = %v", inErr, err)
+	}
 }
 
 func TestCleanCommand(t *testing.T) {

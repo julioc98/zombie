@@ -36,14 +36,12 @@ func cleanCommand(line string) (commands []string, err error) {
 		}
 
 		if matched, err := regexp.MatchString("^('|\")", item); err != nil {
-			fmt.Println(err.Error())
 			return nil, err
 		} else if matched && quotedString == "" {
 			startString = i
 			quotedString = item
 			quote = quotedString[0]
 		} else if matched, err := regexp.MatchString("[^\\\\]('|\")$", item); err != nil {
-			fmt.Println(err.Error())
 			return nil, err
 		} else if currentQuote := item[len(item)-1]; matched && currentQuote == quote {
 			comm = append(comm[:startString], comm[i:]...)
