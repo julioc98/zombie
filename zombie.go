@@ -2,8 +2,10 @@ package zombie
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 )
 
@@ -21,6 +23,40 @@ func readArchive(path string) (lines []string, err error) {
 	return lines, nil
 }
 
+func cleanCommand(line string) (commands []string, err error) {
+	var quotedString string
+	var startString int
+	var quote byte
+	comm := strings.Split(line, " ")
+	for i, l := 0, len(comm); i < l; i++ {
+		item := comm[i]
+
+		if quotedString != "" {
+			quotedString = fmt.Sprintf("%s %s", quotedString, item)
+		}
+
+		if matched, err := regexp.MatchString("^('|\")", item); err != nil {
+			fmt.Println(err.Error())
+			return nil, err
+		} else if matched && quotedString == "" {
+			startString = i
+			quotedString = item
+			quote = quotedString[0]
+		} else if matched, err := regexp.MatchString("[^\\\\]('|\")$", item); err != nil {
+			fmt.Println(err.Error())
+			return nil, err
+		} else if currentQuote := item[len(item)-1]; matched && currentQuote == quote {
+			comm = append(comm[:startString], comm[i:]...)
+			comm[startString] = quotedString
+			quotedString = ""
+			quote = 0
+			l = len(comm)
+		}
+	}
+
+	return comm, nil
+}
+
 // ExecCommandPath ...
 func ExecCommandPath(path string) (outputs []string, err error) {
 	commands, err := readArchive(path)
@@ -28,9 +64,8 @@ func ExecCommandPath(path string) (outputs []string, err error) {
 		return nil, err
 	}
 	for _, command := range commands {
-		comm := strings.Split(command, " ")
-
-		out, err := exec.Command(comm[0], comm[1:]...).CombinedOutput()
+		param, err := cleanCommand(command)
+		out, err := exec.Command(param[0], param[1:]...).CombinedOutput()
 		if err != nil {
 			return nil, err
 		}
