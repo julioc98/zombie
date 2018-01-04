@@ -33,4 +33,15 @@ func TestExecCommandPath(t *testing.T) {
 	if x, _ := ExecCommandPath(in); !reflect.DeepEqual(x, out) {
 		t.Errorf("ExecCommandPath(%v) = %v, want %v", in, x, out)
 	}
+	// Error case one
+	var inErr = "configx"
+	if _, err := ExecCommandPath(inErr); err == nil {
+		t.Errorf("ExecCommandPath(%v) = %v", inErr, err)
+
+	}
+	// Error case two
+	var inArch = "config_empy"
+	if _, err := ExecCommandPath(inArch); err == nil {
+		t.Errorf("ExecCommandPath(%v) = %v", inArch, err)
+	}
 }

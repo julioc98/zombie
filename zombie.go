@@ -36,7 +36,6 @@ func cleanCommand(line string) (commands []string, err error) {
 			quotedString = fmt.Sprintf("%s %s", quotedString, item)
 		}
 		if matched := rQuote.MatchString(item); matched && quotedString == "" {
-			fmt.Println(matched)
 			startString = i
 			quotedString = item
 			quote = quotedString[0]
