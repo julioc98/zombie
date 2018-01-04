@@ -28,24 +28,19 @@ func cleanCommand(line string) (commands []string, err error) {
 	var startString int
 	var quote byte
 	comm := strings.Split(line, " ")
+	rQuote, rSlashQuote := regexp.MustCompile("^('|\")"), regexp.MustCompile("[^\\\\]('|\")$")
 	for i, l := 0, len(comm); i < l; i++ {
 		item := comm[i]
 
 		if quotedString != "" {
 			quotedString = fmt.Sprintf("%s %s", quotedString, item)
 		}
-
-		if matched, err := regexp.MatchString("^('|\")", item); err != nil {
-			fmt.Println(err.Error())
-			return nil, err
-		} else if matched && quotedString == "" {
+		if matched := rQuote.MatchString(item); matched && quotedString == "" {
+			fmt.Println(matched)
 			startString = i
 			quotedString = item
 			quote = quotedString[0]
-		} else if matched, err := regexp.MatchString("[^\\\\]('|\")$", item); err != nil {
-			fmt.Println(err.Error())
-			return nil, err
-		} else if currentQuote := item[len(item)-1]; matched && currentQuote == quote {
+		} else if currentQuote, matched := item[len(item)-1], rSlashQuote.MatchString(item); matched && currentQuote == quote {
 			comm = append(comm[:startString], comm[i:]...)
 			comm[startString] = quotedString
 			quotedString = ""
