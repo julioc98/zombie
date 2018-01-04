@@ -19,10 +19,12 @@ func TestReadArchive(t *testing.T) {
 }
 
 func TestCleanCommand(t *testing.T) {
-	var in, out = "commit -m \"message with space\" hi -m 'another message'", []string{"commit", "-m", "\"message with space\"", "hi", "-m", "'another message'"}
-
+	var (
+		in  = "commit -m \"message with space\" hi -m 'another message'"
+		out = []string{"commit", "-m", "\"message with space\"", "hi", "-m", "'another message'"}
+	)
 	if x, _ := cleanCommand(in); !reflect.DeepEqual(x, out) {
-		t.Errorf("cleanCommand(%v) = %v, want %v || %s", in, x, out, strings.Join(x, "_"))
+		t.Errorf("cleanCommand(%v) = %v, want %v || %v --- %s", in, x, out, strings.Join(out, "_"), strings.Join(x, "_"))
 	}
 }
 
