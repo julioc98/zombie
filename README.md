@@ -1,6 +1,8 @@
 # Zombie
 Package from Golang, running commands on terminal
 
+[![Build Status](https://travis-ci.org/julioc98/zombie.svg?branch=master)](https://travis-ci.org/julioc98/zombie)
+
 ### Prerequisites
 
 * [Golang](https://github.com/golang/go) 
